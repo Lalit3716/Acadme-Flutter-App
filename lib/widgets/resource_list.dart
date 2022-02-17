@@ -10,13 +10,17 @@ class ResourceList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: resources.length,
-      itemBuilder: (context, index) {
-        final resource = resources[index];
+    return resources.isNotEmpty
+        ? ListView.builder(
+            itemCount: resources.length,
+            itemBuilder: (context, index) {
+              final resource = resources[index];
 
-        return ResourceItem(resource: resource);
-      },
-    );
+              return ResourceItem(resource: resource);
+            },
+          )
+        : const Center(
+            child: Text('No resources found.'),
+          );
   }
 }
