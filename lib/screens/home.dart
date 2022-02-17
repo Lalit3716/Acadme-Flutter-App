@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/resources.dart';
+import '../widgets/resource_list.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -24,19 +25,60 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Acadme"),
-        actions: <Widget>[
-          Container(
-            margin: const EdgeInsets.only(right: 20),
-            child: CircleAvatar(
-              backgroundImage: Image.asset('assets/images/avatar.jpg').image,
-              radius: 20,
+      drawer: Drawer(
+        child: ListView(children: <Widget>[
+          DrawerHeader(
+            child: Container(
+              alignment: Alignment.topLeft,
+              child: Column(
+                children: [
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: CircleAvatar(
+                      backgroundImage:
+                          Image.asset("assets/images/avatar.jpg").image,
+                      radius: 30,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: const Text(
+                      "John Doe",
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.blue,
             ),
           ),
-        ],
-        bottom: AppBar(
-          title: const SizedBox(
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text("Home"),
+            selected: true,
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text("Logout"),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+        ]),
+      ),
+      appBar: AppBar(
+        title: const Text("Acadme"),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(50),
+          child: SizedBox(
             width: double.infinity,
             height: 40,
             child: Center(
@@ -55,119 +97,7 @@ class Home extends StatelessWidget {
         future: getResources(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final resource = snapshot.data![index];
-
-                return Container(
-                  width: double.infinity,
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height / 3,
-                  ),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    elevation: 10,
-                    child: Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                          child: resource.thumbnail != null
-                              ? Image.network(
-                                  resource.thumbnail!,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height:
-                                      MediaQuery.of(context).size.height / 5,
-                                )
-                              : Image.asset(
-                                  'assets/images/note-taking.png',
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height:
-                                      MediaQuery.of(context).size.height / 5,
-                                ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 10,
-                          ),
-                          width: double.infinity,
-                          child: Text(
-                            resource.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(
-                            left: 5,
-                            bottom: 5,
-                          ),
-                          width: double.infinity,
-                          child: Text(
-                            resource.description,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            // Upvote and Downvote Icons
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.thumb_up),
-                                  onPressed: () {},
-                                ),
-                                Text(
-                                  resource.upvotes.toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.thumb_down),
-                                  onPressed: () {},
-                                ),
-                                Text(
-                                  resource.downvotes.toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
+            return ResourceList(resources: snapshot.data!);
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
